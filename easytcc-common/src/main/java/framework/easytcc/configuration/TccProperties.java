@@ -22,19 +22,19 @@ public class TccProperties {
 	@Value("${" + PREFIX + ".transaction.remote.sync:true}")
 	private boolean remoteSync;
 
-	@Value("${" + PREFIX + ".recovery.enabled:true}")
+	@Value("${" + PREFIX + ".transaction.recovery.enabled:true}")
 	private boolean recoveryEnabled;
 
-	@Value("${" + PREFIX + ".recovery.maxRetrys:5}")
+	@Value("${" + PREFIX + ".transaction.recovery.maxRetrys:5}")
 	private int recoveryMaxRetrys;
 
-	@Value("${" + PREFIX + ".recovery.initialDelaySeconds:60}")
+	@Value("${" + PREFIX + ".transaction.recovery.initialDelaySeconds:60}")
 	private int recoveryInitialDelaySeconds;
 
-	@Value("${" + PREFIX + ".recovery.periodSeconds:30}")
+	@Value("${" + PREFIX + ".transaction.recovery.periodSeconds:30}")
 	private int recoveryPeriodSeconds;
 
-	@Value("${" + PREFIX + ".recovery.beforeSeconds:60}")
+	@Value("${" + PREFIX + ".transaction.recovery.beforeSeconds:60}")
 	private int recoveryBeforeSeconds;
 
 	@Value("${" + PREFIX + ".clearXid.initialDelaySeconds:60}")

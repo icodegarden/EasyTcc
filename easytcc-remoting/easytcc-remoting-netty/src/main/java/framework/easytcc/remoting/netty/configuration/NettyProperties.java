@@ -34,7 +34,7 @@ public class NettyProperties {
 	@Value("${" + PREFIX + ".heartbeat:10000}")
 	private int heartbeat;
 	
-	@Value("${" + PREFIX + ".repository.expireMillis:10000}")
+	@Value("${" + PREFIX + ".repository.expireMillis:20000}")
 	private int repositoryExpireMills;
 	
 	@Value("${" + PREFIX + ".repository.updateExpireRateMillis:5000}")
