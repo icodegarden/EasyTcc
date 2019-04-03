@@ -78,24 +78,23 @@ public class RedisLocalTransactionRepository extends AbstractRedisRepository imp
 			if (all == null || all.isEmpty()) {
 				return Collections.EMPTY_LIST;
 			}
+			List<LocalTransaction> resultList = new LinkedList<LocalTransaction>();
+
+			String localTransactionKeyPrefix = generateLocalTransactionKeyPrefix();
+			for (Map.Entry<String, String> entry : all.entrySet()) {
+				String key = entry.getKey();
+				if (key.startsWith(localTransactionKeyPrefix)) {
+					byte[] bs = jedis.get(key.getBytes());
+					if (bs != null) {
+						LocalTransaction localTransaction = (LocalTransaction) SerializationUtils.deseriaObject(bs);
+						resultList.add(localTransaction);
+					}
+				}
+			}
+			return resultList;
 		} finally {
 			close(jedis);
 		}
-		
-		List<LocalTransaction> resultList = new LinkedList<LocalTransaction>();
-
-		String localTransactionKeyPrefix = generateLocalTransactionKeyPrefix();
-		for (Map.Entry<String, String> entry : all.entrySet()) {
-			String key = entry.getKey();
-			if (key.startsWith(localTransactionKeyPrefix)) {
-				byte[] bs = jedis.get(key.getBytes());
-				if (bs != null) {
-					LocalTransaction localTransaction = (LocalTransaction) SerializationUtils.deseriaObject(bs);
-					resultList.add(localTransaction);
-				}
-			}
-		}
-		return resultList;
 	}
 
 	@Override
