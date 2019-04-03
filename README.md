@@ -31,3 +31,7 @@ Transactions that fail to commit, roll back (real-time failures, eventual consen
 After reaching the number of times, the global transaction and local transaction data will be transferred to the failure area for queries to be processed manually.  
 自动会对提交、回滚失败（实时失败、最终一致失败等）的事务进行重试，直到失败次数达到所配置的次数，详见[配置](https://github.com/HiFangfangXu/EasyTcc/wiki/Configurations)  
 达到次数后，全局事务、本地事务数据将被移交至失败区，可供查询人工处理  
+
+# Contact me 联系方式
+WeChat 微信号 13486011021
+
