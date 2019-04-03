@@ -23,8 +23,8 @@ if a transaction fails (network reasons, etc.), it will be reserved for recovery
 ## localTransaction and localTransactionBeginStack
 local transaction is the local transaction of each service in this global transaction,Because a local transaction may have multiple transaction annotations, the local Transaction BeginStack is the method stack for creating local transactions  
 local transaction 是每个服务在本次全局事务中的本地事务,由于一个本地事务可能有多处使用事务注解，localTransactionBeginStack 是本地事务的创建方法栈  
-Local Transaction BeginStack saves local transaction data after tcc's try phase, which is used for comfirm/cancel decision-making in the next phase.  
-localTransactionBeginStack 会在tcc的try阶段结束后保存本地事务数据，用于下阶段的comfirm/cancel作出决策  
+Local Transaction BeginStack saves local transaction data after tcc's try phase, which is used for confirm/cancel decision-making in the next phase.  
+localTransactionBeginStack 会在tcc的try阶段结束后保存本地事务数据，用于下阶段的confirm/cancel作出决策  
 
 ## transaction recovery
 Transactions that fail to commit, roll back (real-time failures, eventual consensus failures, etc.) are retried automatically until the number of failures reaches the number of configurations, as detailed in the [configurations](https://github.com/HiFangfangXu/EasyTcc/wiki/Configurations).    
