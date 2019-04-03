@@ -16,7 +16,7 @@ Cancel: To cancel the execution of business, idempotency must be satisfied
 xid is Global transaction ID,xidCreateStack is a stack for creating global transaction ID  
 xid是一个全局事务ID，xidCreateStack是创建全局事务的方法栈  
 by default, transactions will be processed real time by netty(Contains local and remote transactions),which is started in xidCreateStack  
-默认情况事务将使用netty被实时处理(包含本地事务和远程事务),这项工作从 xidCreateStack 发起
+事务默认使用netty实时处理(包含本地事务和远程事务),这项工作从 xidCreateStack 发起
 if a transaction fails (network reasons, etc.), it will be reserved for recovery until the number of failed configurations  
 事务若处理失败（网络原因等），将被保留等待恢复，直到配置的失败次数
 
