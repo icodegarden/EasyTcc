@@ -16,7 +16,7 @@ public class ContextHystrixConcurrencyStrategy extends HystrixConcurrencyStrateg
 	private HystrixConcurrencyStrategy existingHystrixConcurrencyStrategy;
 
 	/**
-	 * Decorator
+	 * Decorator 
 	 * @param existingHystrixConcurrencyStrategy	can be null
 	 */
     public ContextHystrixConcurrencyStrategy(HystrixConcurrencyStrategy existingHystrixConcurrencyStrategy) {
