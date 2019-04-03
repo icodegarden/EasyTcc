@@ -32,7 +32,7 @@ After reaching the number of times, the global transaction and local transaction
 自动会对提交、回滚失败（实时失败、最终一致失败等）的事务进行重试，直到失败次数达到所配置的次数，详见[配置](https://github.com/HiFangfangXu/EasyTcc/wiki/Configurations)  
 达到次数后，全局事务、本地事务数据将被移交至失败区，可供查询人工处理  
 
-# [Developer-Documentation 开发者文档]https://github.com/HiFangfangXu/EasyTcc/wiki/Developer-Documentation
+# [Developer-Documentation 开发者文档](https://github.com/HiFangfangXu/EasyTcc/wiki/Developer-Documentation)
 Spring cloud, Dubbo integration and related customization  
 springcloud、dubbo等集成和相关自定义  
 
