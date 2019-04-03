@@ -7,7 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import framework.easytcc.annotation.EasyTcc;
+import github.easytcc.annotation.EasyTcc;
 import xff.test.bank.entity.TransferInAccount;
 import xff.test.bank.entity.TransferInOrder;
 import xff.test.bank.repository.TransferInAccountRepository;

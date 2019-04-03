@@ -6,7 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import framework.easytcc.annotation.EasyTcc;
+import github.easytcc.annotation.EasyTcc;
 import xff.test.bank.entity.TransferOutAccount;
 import xff.test.bank.entity.TransferOutOrder;
 import xff.test.bank.repository.TransferOutAccountRepository;

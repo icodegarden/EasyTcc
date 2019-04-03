@@ -4,7 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import framework.easytcc.annotation.EasyTcc;
+import github.easytcc.annotation.EasyTcc;
 import xff.test.dto.ScoreIncrDto;
 import xff.test.score.entity.ScoreAccount;
 import xff.test.score.entity.ScoreIncrOrder;

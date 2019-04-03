@@ -2,8 +2,8 @@ package xff.test;
 
 import org.springframework.http.HttpHeaders;
 
-import framework.easytcc.support.ContextHeaders;
-import framework.easytcc.support.ContextHeaders.KeyValuePair;
+import github.easytcc.support.ContextHeaders;
+import github.easytcc.support.ContextHeaders.KeyValuePair;
 
 /**
  * 

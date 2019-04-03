@@ -8,7 +8,7 @@ import org.springframework.context.annotation.ComponentScan;
  * @author Fangfang.Xu
  */
 @SpringBootApplication
-@ComponentScan({"xff.test","framework.easytcc"})
+@ComponentScan({"xff.test","github.easytcc"})
 public class ScoreApplication {
 
 	public static void main(String[] args) {

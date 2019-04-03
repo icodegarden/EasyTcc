@@ -15,7 +15,7 @@ import xff.test.bank.repository.TransferInAccountRepository;
  * @author Fangfang.Xu
  */
 @SpringBootApplication
-@ComponentScan({ "xff.test", "framework.easytcc" })
+@ComponentScan({ "xff.test", "github.easytcc" })
 public class BankinApplication {
 
 	public static void main(String[] args) {
