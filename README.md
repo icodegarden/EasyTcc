@@ -33,5 +33,5 @@ After reaching the number of times, the global transaction and local transaction
 达到次数后，全局事务、本地事务数据将被移交至失败区，可供查询人工处理  
 
 # Contact me 联系方式
-WeChat 微信号 13486011021
+WeChat 微信号 13486011021  
 FangfangXu 徐芳方
