@@ -21,6 +21,18 @@ public class TccProperties {
 
 	@Value("${" + PREFIX + ".transaction.remote.sync:true}")
 	private boolean remoteSync;
+	
+	@Value("${" + PREFIX + ".transaction.handle.threadpool.corePoolSize:30}")
+	private int transactionHandleCorePoolSize;
+	
+	@Value("${" + PREFIX + ".transaction.threadpool.maxPoolSize:30}")
+	private int transactionHandleMaxPoolSize;
+	
+	@Value("${" + PREFIX + ".transaction.threadpool.keepAliveSeconds:60}")
+	private int transactionHandlekeepAliveSeconds;
+	
+	@Value("${" + PREFIX + ".transaction.threadpool.queueSize:"+Integer.MAX_VALUE+"}")
+	private int transactionHandleQueueSize;
 
 	@Value("${" + PREFIX + ".transaction.recovery.enabled:true}")
 	private boolean recoveryEnabled;
@@ -92,4 +104,21 @@ public class TccProperties {
 	public boolean isMetricsEnabled() {
 		return metricsEnabled;
 	}
+
+	public int getTransactionHandleCorePoolSize() {
+		return transactionHandleCorePoolSize;
+	}
+
+	public int getTransactionHandleMaxPoolSize() {
+		return transactionHandleMaxPoolSize;
+	}
+
+	public int getTransactionHandlekeepAliveSeconds() {
+		return transactionHandlekeepAliveSeconds;
+	}
+
+	public int getTransactionHandleQueueSize() {
+		return transactionHandleQueueSize;
+	}
+
 }

@@ -64,6 +64,9 @@ public class TransferOutServiceImpl implements TransferOutService {
 	@Transactional
 	public void confirm(TransferAmtDto transferOutDto) {
 		System.out.println("start confirm transfer out:" + transferOutDto.getTransferNumber());
+		//test maximum number of failures transaction add to recovery failed
+		transferOutDto.getExceptions().exceptionBankoutConfirm();
+		
 		TransferOutOrder order = transferOrderRepository.findByTransferNumber(transferOutDto.getTransferNumber());
 		if (order != null && "try".equals(order.getStatus())) {
 			order.setStatus("confirm");
@@ -75,6 +78,9 @@ public class TransferOutServiceImpl implements TransferOutService {
 	@Transactional
 	public void cancel(TransferAmtDto transferOutDto) {
 		System.out.println("start rollback transfer out:" + transferOutDto.getTransferNumber());
+		//test maximum number of failures transaction add to recovery failed
+		transferOutDto.getExceptions().exceptionBankoutCancel();
+		
 		TransferOutOrder order = transferOrderRepository.findByTransferNumber(transferOutDto.getTransferNumber());
 		if (order != null && "try".equals(order.getStatus())) {
 			//order cancel

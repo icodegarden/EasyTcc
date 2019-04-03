@@ -1,12 +1,17 @@
 package github.easytcc;
 
+import java.util.concurrent.LinkedBlockingDeque;
+import java.util.concurrent.ThreadFactory;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
+
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Pointcut;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import github.easytcc.configuration.TccProperties;
 import github.easytcc.context.TransactionContext;
@@ -26,12 +31,38 @@ public class TransactionAspect {
 
 	static Logger logger = LoggerFactory.getLogger(TransactionAspect.class);
 
-	@Autowired
 	AspectExecutionChain chain;
-	@Autowired
+
 	XidRepository xidRepository;
-	@Autowired
+
 	TccProperties tccProperties;
+
+	ThreadPoolExecutor handleThreadPool;
+
+	public TransactionAspect(AspectExecutionChain chain, XidRepository xidRepository, TccProperties tccProperties) {
+		this.chain = chain;
+		this.xidRepository = xidRepository;
+		this.tccProperties = tccProperties;
+		handleThreadPool = new ThreadPoolExecutor(tccProperties.getTransactionHandleCorePoolSize(),
+				tccProperties.getTransactionHandleMaxPoolSize(), tccProperties.getTransactionHandlekeepAliveSeconds(),
+				TimeUnit.SECONDS, new LinkedBlockingDeque<Runnable>(tccProperties.getTransactionHandleQueueSize()),
+				new ThreadFactory() {
+					ThreadGroup mGroup;
+					protected final AtomicInteger mThreadNum = new AtomicInteger(1);
+					{
+						SecurityManager s = System.getSecurityManager();
+						mGroup = (s == null) ? Thread.currentThread().getThreadGroup() : s.getThreadGroup();
+					}
+
+					@Override
+					public Thread newThread(Runnable r) {
+						String name = "EasyTcc-transaction-thread-" + mThreadNum.getAndIncrement();
+						Thread ret = new Thread(mGroup, r, name, 0);
+						ret.setDaemon(false);
+						return ret;
+					}
+				});
+	}
 
 	@Pointcut("@annotation(github.easytcc.annotation.EasyTcc)")
 	public void pointcut() {
@@ -39,7 +70,7 @@ public class TransactionAspect {
 
 	@Around("pointcut()")
 	public Object around(ProceedingJoinPoint pjp) throws Throwable {
-		ProceedingJoinPointWrapper pointWrapper = new ProceedingJoinPointWrapper(pjp);
+		final ProceedingJoinPointWrapper pointWrapper = new ProceedingJoinPointWrapper(pjp);
 
 		TransactionContext transactionContext = TransactionContextHolder.getContext();
 		if (transactionContext == null) {
@@ -68,23 +99,56 @@ public class TransactionAspect {
 		} catch (Exception e) {
 			throw new TccException("tcc ExecutionChain PreHandle error,cause : {} " + e.getMessage(), e);
 		}
-		Throwable ex = null;
 		try {
 			Object result = pjp.proceed();
 
+			handleThreadPool.execute(new AfterProceedSuccessRunnable(transactionContext, pointWrapper));
+
+			return result;
+		} catch (final Throwable e) {
+			handleThreadPool.execute(new AfterProceedFailedRunnable(transactionContext, pointWrapper, e));
+			throw e;
+		}
+	}
+
+	class AfterProceedSuccessRunnable implements Runnable {
+		TransactionContext transactionContext;
+		ProceedingJoinPointWrapper pointWrapper;
+		AfterProceedSuccessRunnable(TransactionContext transactionContext, ProceedingJoinPointWrapper pointWrapper) {
+			this.transactionContext = transactionContext;
+			this.pointWrapper = pointWrapper;
+		}
+		@Override
+		public void run() {
+			TransactionContextHolder.setContext(transactionContext);
 			try {
 				chain.applyPostHandle(pointWrapper);
 			} catch (Exception e) {
 				logger.error("transaction chain post handle error", e);
 			}
-
-			return result;
-		} catch (Throwable e) {
-			ex = e;
-			throw e;
-		} finally {
 			try {
-				chain.triggerAfterHandleCompletion(pointWrapper, ex);
+				chain.triggerAfterHandleCompletion(pointWrapper, null);
+			} catch (Exception e) {
+				logger.error("transaction chain after completion handle error", e);
+			}
+		}
+	}
+
+	class AfterProceedFailedRunnable implements Runnable {
+		TransactionContext transactionContext;
+		ProceedingJoinPointWrapper pointWrapper;
+		Throwable e;
+		AfterProceedFailedRunnable(TransactionContext transactionContext, ProceedingJoinPointWrapper pointWrapper,
+				Throwable e) {
+			this.transactionContext = transactionContext;
+			this.pointWrapper = pointWrapper;
+			this.e = e;
+		}
+		@Override
+		public void run() {
+			TransactionContextHolder.setContext(transactionContext);
+			try {
+				chain.triggerAfterHandleCompletion(pointWrapper, e);
 			} catch (Exception e) {
 				logger.error("transaction chain after completion handle error", e);
 			}

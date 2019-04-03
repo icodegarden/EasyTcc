@@ -14,6 +14,10 @@ public class Exceptions implements Serializable{
 	
 	boolean exceptionBeforeBankinScoreReturn = false;
 	
+	boolean exceptionBankoutConfirm = false;
+	
+	boolean exceptionBankoutCancel = false;
+	
 	public void exceptionBeforeBankinReturn() {
 		if(exceptionBeforeBankinReturn) {
 			throw new RuntimeException("exceptionBeforeBankinReturn");
@@ -29,6 +33,16 @@ public class Exceptions implements Serializable{
 	public void exceptionBeforeBankinScoreReturn() {
 		if(exceptionBeforeBankinScoreReturn) {
 			throw new RuntimeException("exceptionBeforeBankinScoreReturn");
+		}
+	}
+	public void exceptionBankoutConfirm() {
+		if(exceptionBankoutConfirm) {
+			throw new RuntimeException("exceptionBankoutConfirm");
+		}
+	}
+	public void exceptionBankoutCancel() {
+		if(exceptionBankoutCancel) {
+			throw new RuntimeException("exceptionBankoutCancel");
 		}
 	}
 
@@ -56,5 +70,19 @@ public class Exceptions implements Serializable{
 		return exceptionBeforeBankinScoreReturn;
 	}
 
-	
+	public boolean isExceptionBankoutConfirm() {
+		return exceptionBankoutConfirm;
+	}
+
+	public void setExceptionBankoutConfirm(boolean exceptionBankoutConfirm) {
+		this.exceptionBankoutConfirm = exceptionBankoutConfirm;
+	}
+
+	public boolean isExceptionBankoutCancel() {
+		return exceptionBankoutCancel;
+	}
+
+	public void setExceptionBankoutCancel(boolean exceptionBankoutCancel) {
+		this.exceptionBankoutCancel = exceptionBankoutCancel;
+	}
 }

@@ -38,4 +38,12 @@ public class TransferOutTest {
 		
 		ConcurrentTransfer.transferOut(exceptions,100);
 	}
+	
+	@Test
+	public void testExceptionBankoutConfirm() throws Exception {
+		Exceptions exceptions = new Exceptions();
+		exceptions.setExceptionBankoutConfirm(true);
+		
+		ConcurrentTransfer.transferOut(exceptions,1);
+	}
 }
