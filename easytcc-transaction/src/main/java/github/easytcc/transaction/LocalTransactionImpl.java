@@ -39,10 +39,10 @@ public class LocalTransactionImpl extends AbstractTransaction implements LocalTr
 	 */
 	private boolean isRecovering;
 	
-	public LocalTransactionImpl(String xid,String parentId,boolean remoteSync){
+	public LocalTransactionImpl(String xid,String parentId,boolean realtime){
 		super(xid);
 		this.parentId = parentId;
-		if(remoteSync) {
+		if(realtime) {
 			remoteTransaction = new RemoteTransaction(xid, this.getTransactionId());
 		}else {
 			remoteTransaction = new NonOpRemoteTransaction(xid, this.getTransactionId());

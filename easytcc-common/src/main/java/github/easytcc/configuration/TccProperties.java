@@ -19,10 +19,10 @@ public class TccProperties {
 	@Value("${spring.application.name}")
 	private String application;
 
-	@Value("${" + PREFIX + ".transaction.remote.sync:true}")
-	private boolean remoteSync;
+	@Value("${" + PREFIX + ".transaction.remote.realtime:true}")
+	private boolean realtime;
 	
-	@Value("${" + PREFIX + ".transaction.handle.threadpool.corePoolSize:30}")
+	@Value("${" + PREFIX + ".transaction.handle.threadpool.corePoolSize:15}")
 	private int transactionHandleCorePoolSize;
 	
 	@Value("${" + PREFIX + ".transaction.threadpool.maxPoolSize:30}")
@@ -65,8 +65,8 @@ public class TccProperties {
 		return application;
 	}
 
-	public boolean isRemoteSync() {
-		return remoteSync;
+	public boolean isRealtime() {
+		return realtime;
 	}
 
 	public boolean isRecoveryEnabled() {

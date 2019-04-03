@@ -89,7 +89,7 @@ public class TransactionAspect {
 
 			Xid xid = transactionContext.getXid();
 			localTransaction = new LocalTransactionImpl(xid.id(), transactionContext.getParentId(),
-					tccProperties.isRemoteSync());
+					tccProperties.isRealtime());
 
 			transactionContext.setLocalTransaction(localTransaction);
 		}
