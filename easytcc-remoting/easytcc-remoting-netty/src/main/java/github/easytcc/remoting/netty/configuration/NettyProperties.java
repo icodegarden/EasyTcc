@@ -19,16 +19,20 @@ public class NettyProperties {
 
 	static final String PREFIX = "easytcc.netty";
 
-	@Value("${" + PREFIX + ".port:16789}")
+	@Value("${" + PREFIX + ".server.port:16789}")
 	private int nettyServerPort;
 	
-	@Value("${" + PREFIX + ".threadpool:cached}")
+	//1-100
+	@Value("${" + PREFIX + ".server.weight:50}")
+	private int nettyServerWeight;
+	
+	@Value("${" + PREFIX + ".server.threadpool:cached}")
 	private String threadpool;
 	
-	@Value("${" + PREFIX + ".requestTimeout:3000}")
+	@Value("${" + PREFIX + ".client.requestTimeout:3000}")
 	private int requestTimeout;
 	
-	@Value("${" + PREFIX + ".responseTimeout:3000}")
+	@Value("${" + PREFIX + ".client.responseTimeout:3000}")
 	private int responseTimeout;
 	
 	@Value("${" + PREFIX + ".heartbeat:10000}")
@@ -74,4 +78,9 @@ public class NettyProperties {
 	public String getThreadpool() {
 		return threadpool;
 	}
+
+	public int getNettyServerWeight() {
+		return nettyServerWeight;
+	}
+	
 }

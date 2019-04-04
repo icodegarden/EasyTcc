@@ -57,7 +57,7 @@ public class NettyTransactionChannel implements TransactionChannel, ApplicationL
 		// add to repo
 		try {
 			nettyRepository.addServer(bind, nettyProperties.getNettyServerPort(),
-					nettyProperties.getRepositoryExpireMills());
+					nettyProperties.getNettyServerWeight(), nettyProperties.getRepositoryExpireMills());
 		} catch (Exception e) {
 			server.close();
 			server = null;

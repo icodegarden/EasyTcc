@@ -1,6 +1,8 @@
 package github.easytcc.remoting.netty.repository;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 import java.util.Set;
 
 import org.slf4j.Logger;
@@ -10,6 +12,7 @@ import github.easytcc.repository.redis.AbstractRedisRepository;
 import github.easytcc.repository.redis.RedisResource;
 import github.easytcc.remoting.netty.configuration.NettyProperties;
 import redis.clients.jedis.Jedis;
+import redis.clients.jedis.Pipeline;
 
 /**
  * @author Fangfang.Xu
@@ -22,6 +25,8 @@ public class RedisNettyRepository extends AbstractRedisRepository implements Net
 	private static final String KEY_NETTY_SERVER_PREFIX = "nettyserver:";
 
 	private static final String KEY_NETTY_SERVER_PREFIX2 = "@";
+	
+	private Random random = new Random();
 
 	NettyProperties nettyProperties;
 	
@@ -31,14 +36,23 @@ public class RedisNettyRepository extends AbstractRedisRepository implements Net
 	}
 
 	@Override
-	public void addServer(String address, int port, long expireMills) {
+	public void addServer(String address, int port,int weight, long expireMills) {
+		if(weight < 1 || weight > 100) {
+			throw new IllegalArgumentException("netty server weight should between 1 and 100");
+		}
 		Jedis jedis = null;
+		Pipeline pipeline = null;
 		try {
 			jedis = redisResource.getResource();
-			// value is connections count
-			jedis.set(generateNettyServerKey(address, port), "0", "NX", "PX", expireMills);
+			pipeline = jedis.pipelined();
+			String key = generateNettyServerKey(address, port);
+			pipeline.multi();
+			pipeline.set(key, weight + "");
+			pipeline.pexpire(key, expireMills);
+			pipeline.exec();
 		} finally {
-			redisResource.close(jedis);
+			close(pipeline);
+			close(jedis);
 		}
 	}
 
@@ -49,35 +63,25 @@ public class RedisNettyRepository extends AbstractRedisRepository implements Net
 			jedis = redisResource.getResource();
 			jedis.pexpire(generateNettyServerKey(address, port), expireMills);
 		} finally {
-			redisResource.close(jedis);
+			close(jedis);
 		}
 	}
 
 	@Override
 	public void incrConnection(String address, int port) {
-		Jedis jedis = null;
-		try {
-			jedis = redisResource.getResource();
-			jedis.incr(generateNettyServerKey(address, port));
-		} finally {
-			redisResource.close(jedis);
-		}
+		//
 	}
 
 	@Override
 	public void decrConnection(String address, int port) {
-		Jedis jedis = null;
-		try {
-			jedis = redisResource.getResource();
-			jedis.decr(generateNettyServerKey(address, port));
-		} finally {
-			redisResource.close(jedis);
-		}
+		//
 	}
 
 	@Override
 	public String getSuitableServer(String applicationName) {
 		Jedis jedis = null;
+		String[] serverKeys;
+		List<String> weights;
 		try {
 			jedis = redisResource.getResource();
 
@@ -85,21 +89,25 @@ public class RedisNettyRepository extends AbstractRedisRepository implements Net
 			if (keys == null || keys.isEmpty()) {
 				return null;
 			}
-			String[] arrayKeys = keys.toArray(new String[keys.size()]);
-			List<String> connections = jedis.mget(arrayKeys);
-			int minConnection = 0;
-			int minConnectionIndex = 0;
-			for (int i = 0, j = connections.size(); i < j; i++) {
-				int connection = Integer.parseInt(connections.get(i));
-				if (connection <= minConnection) {
-					minConnection = connection;
-					minConnectionIndex = i;
-				}
-			}
-			return arrayKeys[minConnectionIndex].split(KEY_NETTY_SERVER_PREFIX2)[1];
+			serverKeys = keys.toArray(new String[keys.size()]);
+			weights = jedis.mget(serverKeys);
 		} finally {
-			redisResource.close(jedis);
+			close(jedis);
 		}
+		return weightedRandom(serverKeys, weights).split(KEY_NETTY_SERVER_PREFIX2)[1];
+	}
+	
+	private String weightedRandom(String[] serverKeys,List<String> weights) {
+		List<String> serverKeyList = new ArrayList<String>((serverKeys.length * 50));
+		for (int i = 0, j = serverKeys.length; i < j; i++) {
+			String serverKey = serverKeys[i];
+			int weight = Integer.parseInt(weights.get(i));
+			
+			for (int g = 0; g < weight; g++) {
+				serverKeyList.add(serverKey);
+			}
+		}
+		return serverKeyList.get(random.nextInt(serverKeyList.size()));
 	}
 
 	@Override
@@ -109,7 +117,7 @@ public class RedisNettyRepository extends AbstractRedisRepository implements Net
 			jedis = redisResource.getResource();
 			jedis.del(generateNettyServerKey(address, port));
 		} finally {
-			redisResource.close(jedis);
+			close(jedis);
 		}
 	}
 

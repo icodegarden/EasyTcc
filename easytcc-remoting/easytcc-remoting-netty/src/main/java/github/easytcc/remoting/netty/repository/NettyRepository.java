@@ -6,7 +6,14 @@ package github.easytcc.remoting.netty.repository;
  */
 public interface NettyRepository {
 
-	void addServer(String address,int port,long expireMills);
+	/**
+	 * 
+	 * @param address
+	 * @param port
+	 * @param weight	for client loadbalance
+	 * @param expireMills
+	 */
+	void addServer(String address,int port,int weight,long expireMills);
 	
 	void updateExpire(String address,int port,long expireMills);
 	
