@@ -5,7 +5,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import github.easytcc.factory.ExtensionLoader;
-import github.easytcc.remoting.NonOpTransactionChannel;
+import github.easytcc.remoting.NoOpTransactionChannel;
 import github.easytcc.remoting.TransactionChannel;
 
 /**
@@ -24,6 +24,6 @@ public class TransactionChannelConfiguration {
 
 	@Bean
 	public TransactionChannel transactionChannel() throws RemotingException {
-		return ExtensionLoader.getExtension(TransactionChannel.class,new NonOpTransactionChannel());
+		return ExtensionLoader.getExtension(TransactionChannel.class,new NoOpTransactionChannel());
 	}
 }

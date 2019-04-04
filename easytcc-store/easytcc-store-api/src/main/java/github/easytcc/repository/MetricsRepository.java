@@ -6,5 +6,11 @@ package github.easytcc.repository;
  */
 public interface MetricsRepository {
 
-	void xidMetric(long usedMillis);
+	void xidDone(long usedMillis);
+	
+	class NoOpMetricsRepository implements MetricsRepository{
+		@Override
+		public void xidDone(long usedMillis) {
+		}
+	}
 }

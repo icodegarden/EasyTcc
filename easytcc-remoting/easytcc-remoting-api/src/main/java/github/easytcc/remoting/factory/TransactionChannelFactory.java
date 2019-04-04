@@ -1,7 +1,7 @@
 package github.easytcc.remoting.factory;
 
 import github.easytcc.factory.SpringBeanFactory;
-import github.easytcc.remoting.NonOpTransactionChannel;
+import github.easytcc.remoting.NoOpTransactionChannel;
 import github.easytcc.remoting.TransactionChannel;
 
 /**
@@ -19,8 +19,8 @@ public class TransactionChannelFactory {
 				transactionChannel = SpringBeanFactory.getBean(TransactionChannel.class);			
 			}catch (Exception e) {
 				getBeanEx = e;
-				//non oper TransactionChannel
-				transactionChannel = new NonOpTransactionChannel();
+				//no oper TransactionChannel
+				transactionChannel = new NoOpTransactionChannel();
 			}
 		}
 		return transactionChannel;

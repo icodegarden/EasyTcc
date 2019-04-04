@@ -9,6 +9,7 @@ import github.easytcc.factory.ExtensionLoader;
 import github.easytcc.repository.LocalTransactionRepository;
 import github.easytcc.repository.LockRepository;
 import github.easytcc.repository.MetricsRepository;
+import github.easytcc.repository.MetricsRepository.NoOpMetricsRepository;
 import github.easytcc.repository.TransactionDownstreamRepository;
 import github.easytcc.repository.XidRepository;
 import github.easytcc.repository.redis.RedisLocalTransactionRepository;
@@ -55,6 +56,9 @@ public class RepositoryConfiguration {
 
 	@Bean
 	public MetricsRepository metricsRepository() {
+		if(!tccProperties.isMetricsEnabled()) {
+			return new NoOpMetricsRepository();
+		}
 		return ExtensionLoader.getExtension(MetricsRepository.class,
 				new RedisMetricsRepository(redisResource, tccProperties));
 	}

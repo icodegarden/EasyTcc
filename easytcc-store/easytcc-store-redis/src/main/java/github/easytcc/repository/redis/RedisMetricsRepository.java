@@ -25,7 +25,7 @@ public class RedisMetricsRepository extends AbstractRedisRepository implements M
 	}
 	
 	@Override
-	public void xidMetric(long usedMillis) {
+	public void xidDone(long usedMillis) {
 		Jedis jedis = null;
 		Pipeline pipeline = null;
 		try{

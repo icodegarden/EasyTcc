@@ -7,7 +7,7 @@ import github.easytcc.transaction.TransactionStatus;
  * @author Fangfang.Xu
  *
  */
-public class NonOpTransactionChannel implements TransactionChannel {
+public class NoOpTransactionChannel implements TransactionChannel {
 	@Override
 	public void preDownstreamAnnotedMethodExec(String upstreamApplication) {
 	}
