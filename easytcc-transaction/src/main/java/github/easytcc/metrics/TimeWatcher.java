@@ -1,7 +1,5 @@
 package github.easytcc.metrics;
 
-import github.easytcc.configuration.TccProperties;
-import github.easytcc.factory.SpringBeanFactory;
 import github.easytcc.repository.MetricsRepository;
 import github.easytcc.repository.factory.RepositoryFactory;
 
@@ -15,12 +13,12 @@ public class TimeWatcher {
 
 	private long usedMillis;
 
-	TccProperties tccProperties;
+	static MetricsRepository metricsRepository;
 
 	public TimeWatcher() {
-		if (tccProperties == null) {
+		if (metricsRepository == null) {
 			try {
-				tccProperties = SpringBeanFactory.getBean(TccProperties.class);
+				metricsRepository = RepositoryFactory.getMetricsRepository();
 			} catch (Exception e) {
 				// ignore
 			}
@@ -40,9 +38,6 @@ public class TimeWatcher {
 
 	public void end() {
 		stageEnd();
-		if (tccProperties != null && tccProperties.isMetricsEnabled()) {
-			MetricsRepository metricsRepository = RepositoryFactory.getMetricsRepository();
-			metricsRepository.xidMetric(usedMillis);
-		}
+		metricsRepository.xidDone(usedMillis);
 	}
 }
