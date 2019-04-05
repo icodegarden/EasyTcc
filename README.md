@@ -42,4 +42,3 @@ springcloud、dubbo等集成和相关自定义
 
 # Contact me 联系方式
 WeChat 微信号 13486011021  
-FangfangXu 徐芳方
