@@ -21,7 +21,7 @@ public class Clients {
 
 	NettyRepository nettyRepository;
 
-	private volatile Map<String, ExchangeClient> cachedClients = new HashMap<String, ExchangeClient>();
+	private volatile Map<String, Holder<ExchangeClient>> cachedClients = new HashMap<String, Holder<ExchangeClient>>();
 
 	NettyProperties nettyProperties;
 
@@ -31,15 +31,20 @@ public class Clients {
 	}
 
 	public ExchangeClient getClient(String application) {
-		ExchangeClient client = cachedClients.get(application);
+		Holder<ExchangeClient> holder = cachedClients.get(application);
+		if (holder == null) {
+			cachedClients.putIfAbsent(application, new Holder<ExchangeClient>());
+			holder = cachedClients.get(application);
+		}
+		ExchangeClient client = holder.get();
 		if (client != null && client.isClosed()) {
 			client.close();
-			cachedClients.remove(application);
+			holder.remove();
 			client = null;
 		}
 		if (client == null) {
-			synchronized (Clients.class) {
-				client = cachedClients.get(application);
+			synchronized (holder) {
+				client = holder.get();
 				if (client == null) {
 					String hostport = nettyRepository.getSuitableServer(application);
 					if (hostport == null) {
@@ -48,7 +53,7 @@ public class Clients {
 					try {
 						client = Exchangers.connect(URL.valueOf("exchange://" + hostport + "?client=netty4&heartbeat="
 								+ nettyProperties.getHeartbeat()));
-						cachedClients.put(application, client);
+						holder.set(client);
 					} catch (RemotingException e) {
 						throw new TccException(e);
 					}
@@ -56,5 +61,22 @@ public class Clients {
 			}
 		}
 		return client;
+	}
+
+	class Holder<T> {
+
+		private volatile T value;
+
+		public void set(T value) {
+			this.value = value;
+		}
+
+		public T get() {
+			return value;
+		}
+
+		public void remove() {
+			this.value = null;
+		}
 	}
 }
