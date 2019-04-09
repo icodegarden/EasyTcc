@@ -3,6 +3,7 @@ package github.easytcc.repository.redis;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -16,6 +17,8 @@ import github.easytcc.transaction.TransactionStatus;
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.Pipeline;
 import redis.clients.jedis.Response;
+import redis.clients.jedis.ScanParams;
+import redis.clients.jedis.ScanResult;
 
 /**
  * @author Fangfang.Xu
@@ -62,7 +65,24 @@ public class RedisXidRepository extends AbstractRedisRepository implements XidRe
 		List<Response<Map<String, String>>> responses;
 		try {
 			jedis = redisResource.getResource();
-			Set<String> keyset = jedis.keys(KEY_XID_PREFIX + "*");
+			
+			//use set to remove scan duplicates
+			Set<String> keyset = new HashSet<String>();
+			
+			ScanParams scanParams = new ScanParams();
+			scanParams.match(KEY_XID_PREFIX + "*");
+			scanParams.count(100);
+			
+			String cursor = "0";
+			do {
+				ScanResult<String> scanResult = jedis.scan(cursor, scanParams);
+				cursor = scanResult.getStringCursor();
+				List<String> keys = scanResult.getResult();
+				if(keys != null && !keys.isEmpty()) {
+					keyset.addAll(keys);					
+				}
+			}while(!"0".equals(cursor));
+			
 			if (keyset.isEmpty()) {
 				return Collections.EMPTY_LIST;
 			}
@@ -81,7 +101,7 @@ public class RedisXidRepository extends AbstractRedisRepository implements XidRe
 			} finally {
 				close(pipeline);
 			}
-			
+
 			List<Xid> xids = new LinkedList<Xid>();
 			long now = System.currentTimeMillis();
 			for (int i = 0, j = responses.size(); i < j; i++) {
@@ -96,7 +116,7 @@ public class RedisXidRepository extends AbstractRedisRepository implements XidRe
 						}
 					}
 					if (useless) {
-						//return real xid string
+						// return real xid string
 						Xid xid = new Xid(keys[i].replace(KEY_XID_PREFIX, ""), hash.get(XID_HASH_KEY_ACTION));
 						xid.setTransactionStatus(TransactionStatus.get(hash.get(XID_HASH_KEY_STATUS)));
 						xids.add(xid);
@@ -129,6 +149,24 @@ public class RedisXidRepository extends AbstractRedisRepository implements XidRe
 			jedis = redisResource.getResource();
 			String generateXidKey = generateXidKey(xid);
 			jedis.del(generateXidKey);
+		} finally {
+			close(jedis);
+		}
+	}
+
+	@Override
+	public void deleteXids(List<String> xids) {
+		if (xids == null || xids.isEmpty()) {
+			return;
+		}
+		String[] generateXidKeys = new String[xids.size()];
+		for (int i = 0, j = xids.size(); i < j; i++) {
+			generateXidKeys[i] = generateXidKey(xids.get(i));
+		}
+		Jedis jedis = null;
+		try {
+			jedis = redisResource.getResource();
+			jedis.del(generateXidKeys);
 		} finally {
 			close(jedis);
 		}

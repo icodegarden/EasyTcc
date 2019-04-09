@@ -46,16 +46,16 @@ public class TccProperties {
 	@Value("${" + PREFIX + ".transaction.recovery.periodSeconds:30}")
 	private int recoveryPeriodSeconds;
 
-	@Value("${" + PREFIX + ".transaction.recovery.beforeSeconds:60}")
+	@Value("${" + PREFIX + ".transaction.recovery.createdBeforeSeconds:60}")
 	private int recoveryBeforeSeconds;
 
-	@Value("${" + PREFIX + ".clearXid.initialDelaySeconds:60}")
+	@Value("${" + PREFIX + ".transaction.clearXid.initialDelaySeconds:60}")
 	private int clearXidInitialDelaySeconds;
 
-	@Value("${" + PREFIX + ".clearXid.periodSeconds:3600}")
+	@Value("${" + PREFIX + ".transaction.clearXid.periodSeconds:600}")
 	private int clearXidPeriodSeconds;
 
-	@Value("${" + PREFIX + ".clearXid.beforeSeconds:3600}")
+	@Value("${" + PREFIX + ".transaction.clearXid.createdBeforeSeconds:1800}")
 	private int clearXidBeforeSeconds;
 
 	@Value("${" + PREFIX + ".metrics.enabled:true}")
