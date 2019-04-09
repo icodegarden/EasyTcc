@@ -1,8 +1,5 @@
 package github.easytcc.metrics;
 
-import github.easytcc.repository.MetricsRepository;
-import github.easytcc.repository.factory.RepositoryFactory;
-
 /**
  * @author Fangfang.Xu
  *
@@ -12,18 +9,6 @@ public class TimeWatcher {
 	private long beginTimeMillis;
 
 	private long usedMillis;
-
-	static MetricsRepository metricsRepository;
-
-	public TimeWatcher() {
-		if (metricsRepository == null) {
-			try {
-				metricsRepository = RepositoryFactory.getMetricsRepository();
-			} catch (Exception e) {
-				// ignore
-			}
-		}
-	}
 
 	public void stageBegin() {
 		beginTimeMillis = System.currentTimeMillis();
@@ -35,9 +20,12 @@ public class TimeWatcher {
 			usedMillis += currentTimeMillis - beginTimeMillis;
 		}
 	}
+	
+	public long getUsedMillis() {
+		return usedMillis;
+	}
 
 	public void end() {
 		stageEnd();
-		metricsRepository.xidDone(usedMillis);
 	}
 }

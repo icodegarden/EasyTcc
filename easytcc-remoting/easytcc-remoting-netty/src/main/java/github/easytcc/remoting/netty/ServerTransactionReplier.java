@@ -18,7 +18,11 @@ public class ServerTransactionReplier implements Replier<Message> {
 	
 	static Logger logger = LoggerFactory.getLogger(ServerTransactionReplier.class);
 	
-	ServerTransactionExecutor serverTransactionExecutor = new ServerTransactionExecutor();
+	final ServerTransactionExecutor serverTransactionExecutor;
+	
+	public ServerTransactionReplier(ServerTransactionExecutor serverTransactionExecutor) {
+		this.serverTransactionExecutor = serverTransactionExecutor;
+	}
 
     public Class<Message> interest() {
         return Message.class;

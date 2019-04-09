@@ -19,10 +19,12 @@ import org.springframework.context.event.ContextStoppedEvent;
 
 import github.easytcc.configuration.TccProperties;
 import github.easytcc.exception.TccException;
+import github.easytcc.remoting.ServerTransactionExecutor;
 import github.easytcc.remoting.TransactionChannel;
 import github.easytcc.transaction.TransactionStatus;
 import github.easytcc.remoting.netty.configuration.NettyProperties;
 import github.easytcc.remoting.netty.repository.NettyRepository;
+import github.easytcc.repository.LocalTransactionRepository;
 
 /**
  * @author Fangfang.Xu
@@ -40,6 +42,8 @@ public class NettyTransactionChannel implements TransactionChannel, ApplicationL
 	TccProperties tccProperties;
 	@Autowired
 	NettyProperties nettyProperties;
+	@Autowired
+	LocalTransactionRepository localTransactionRepository;
 
 	ExchangeServer server;
 
@@ -52,7 +56,7 @@ public class NettyTransactionChannel implements TransactionChannel, ApplicationL
 						"exchange://" + bind + ":" + nettyProperties.getNettyServerPort() + "?server=netty4&heartbeat="
 								+ nettyProperties.getHeartbeat() + "&threadpool=" + nettyProperties.getThreadpool()),
 				new ServerChannelHandler(nettyRepository, bind, nettyProperties.getNettyServerPort()),
-				new ServerTransactionReplier());
+				new ServerTransactionReplier(new ServerTransactionExecutor(localTransactionRepository)));
 
 		// add to repo
 		try {

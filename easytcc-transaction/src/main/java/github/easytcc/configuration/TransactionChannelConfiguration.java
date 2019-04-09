@@ -1,6 +1,5 @@
 package github.easytcc.configuration;
 
-import org.apache.dubbo.remoting.RemotingException;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -23,7 +22,7 @@ import github.easytcc.remoting.TransactionChannel;
 public class TransactionChannelConfiguration {
 
 	@Bean
-	public TransactionChannel transactionChannel() throws RemotingException {
+	public TransactionChannel transactionChannel() {
 		return ExtensionLoader.getExtension(TransactionChannel.class,new NoOpTransactionChannel());
 	}
 }

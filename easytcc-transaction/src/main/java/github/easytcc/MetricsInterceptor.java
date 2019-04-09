@@ -1,6 +1,7 @@
 package github.easytcc;
 
 import github.easytcc.metrics.TimeWatcher;
+import github.easytcc.repository.MetricsRepository;
 
 /**
  * 
@@ -10,6 +11,12 @@ import github.easytcc.metrics.TimeWatcher;
 public class MetricsInterceptor implements TransactionAspectInterceptor {
 
 	static final String META_TIMEWATCHER = "timeWatcher";
+	
+	final MetricsRepository metricsRepository;
+	
+	public MetricsInterceptor(MetricsRepository metricsRepository) {
+		this.metricsRepository = metricsRepository;
+	}
 
 	@Override
 	public int getOrder() {
@@ -47,6 +54,7 @@ public class MetricsInterceptor implements TransactionAspectInterceptor {
 		if (pointWrapper.isXidCreateStack()) {
 			try {
 				timeWatcher.end();
+				metricsRepository.xidDone(timeWatcher.getUsedMillis());
 			} catch (Exception e1) {
 				// ignore
 			}

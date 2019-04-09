@@ -10,6 +10,7 @@ import github.easytcc.TransactionAspectInterceptor;
 import github.easytcc.TransactionInterceptor;
 import github.easytcc.remoting.TransactionChannel;
 import github.easytcc.repository.LocalTransactionRepository;
+import github.easytcc.repository.MetricsRepository;
 import github.easytcc.repository.TransactionDownstreamRepository;
 import github.easytcc.repository.XidRepository;
 
@@ -25,6 +26,8 @@ public class InterceptorConfiguration {
 	TransactionChannel transactionChannel;
 	@Autowired
 	TccProperties tccProperties;
+	@Autowired
+	MetricsRepository metricsRepository;
 
 	@Bean
 	public AspectExecutionChain chain(TransactionAspectInterceptor[] interceptors) {
@@ -41,6 +44,6 @@ public class InterceptorConfiguration {
 
 	@Bean
 	public TransactionAspectInterceptor metricsInterceptor() {
-		return new MetricsInterceptor();
+		return new MetricsInterceptor(metricsRepository);
 	}
 }
