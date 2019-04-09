@@ -27,6 +27,8 @@ public interface XidRepository {
 	TransactionStatus findXidTransactionStatus(String xid);
 	
 	void deleteXid(String xid);
+	
+	void deleteXids(List<String> xids);
 	/**
 	 * update status to commit
 	 * @param xid

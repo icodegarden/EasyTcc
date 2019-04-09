@@ -1,5 +1,6 @@
 package github.easytcc.task;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
@@ -58,19 +59,15 @@ public class ClearXidTask {
 			if (lockResult.isAcquire()) {
 				List<Xid> xids = xidRepository.findAllUseless(tccProperties.getClearXidBeforeSeconds());
 				if (logger.isDebugEnabled()) {
-					logger.debug("Useless xids found :{}", xids.size());
+					logger.debug("found Useless xids :{}", xids.size());
 				}
-				int clearfailed = 0;
-				for (Xid xid : xids) {
-					try {
-						xidRepository.deleteXid(xid.id());
-					} catch (Exception e) {
-						clearfailed++;
-						logger.error("clear Useless xids error,xid:{}", xid.id(), e);
-					}
+				List<String> ids = new ArrayList<String>(xids.size());
+				for(Xid xid:xids) {
+					ids.add(xid.id());
 				}
+				xidRepository.deleteXids(ids);
 				if (logger.isDebugEnabled()) {
-					logger.debug("clear Useless xids success:{},failed:{}", xids.size() - clearfailed, clearfailed);					
+					logger.debug("clear Useless xids :{}", xids.size());					
 				}
 			}
 		} catch (Exception e) {
