@@ -9,7 +9,8 @@ import org.slf4j.LoggerFactory;
 import github.easytcc.configuration.TccProperties;
 import github.easytcc.exception.NeverBeRecoveryException;
 import github.easytcc.factory.SpringBeanFactory;
-import github.easytcc.repository.factory.RepositoryFactory;
+import github.easytcc.repository.LocalTransactionRepository;
+import github.easytcc.repository.TransactionDownstreamRepository;
 
 /**
  * @author Fangfang.Xu
@@ -84,7 +85,7 @@ public class LocalTransactionImpl extends AbstractTransaction implements LocalTr
 				participant.confirm();
 			}
 			try {
-				RepositoryFactory.getLocalTransactionRepository().deleteAndRemoveRetry(this);
+				SpringBeanFactory.getBean(LocalTransactionRepository.class).deleteAndRemoveRetry(this);
 			} catch (Exception e) {
 				// ignore
 			}
@@ -92,7 +93,7 @@ public class LocalTransactionImpl extends AbstractTransaction implements LocalTr
 			// can not recovery,so remove from retrying, move associate xid to
 			// recoveryFailedXid collection
 			try {
-				RepositoryFactory.getLocalTransactionRepository().addToRecoveryFailed(this);
+				SpringBeanFactory.getBean(LocalTransactionRepository.class).addToRecoveryFailed(this);
 			} catch (Exception e1) {
 				// ignore
 			}
@@ -128,7 +129,7 @@ public class LocalTransactionImpl extends AbstractTransaction implements LocalTr
 				participant.cancel();
 			}
 			try {
-				RepositoryFactory.getLocalTransactionRepository().deleteAndRemoveRetry(this);
+				SpringBeanFactory.getBean(LocalTransactionRepository.class).deleteAndRemoveRetry(this);
 			} catch (Exception e) {
 				// ignore
 			}
@@ -136,7 +137,7 @@ public class LocalTransactionImpl extends AbstractTransaction implements LocalTr
 			// can not recovery,so remove from retrying, move associate xid to
 			// recoveryFailedXid collection
 			try {
-				RepositoryFactory.getLocalTransactionRepository().addToRecoveryFailed(this);
+				SpringBeanFactory.getBean(LocalTransactionRepository.class).addToRecoveryFailed(this);
 			} catch (Exception e1) {
 				// ignore
 			}
@@ -181,13 +182,13 @@ public class LocalTransactionImpl extends AbstractTransaction implements LocalTr
 		scheduleRetryTimes++;
 		TccProperties tccProperties = SpringBeanFactory.getBean(TccProperties.class);
 		if (scheduleRetryTimes >= tccProperties.getRecoveryMaxRetrys()) {
-			RepositoryFactory.getLocalTransactionRepository().addToRecoveryFailed(this);
+			SpringBeanFactory.getBean(LocalTransactionRepository.class).addToRecoveryFailed(this);
 			logger.warn(
 					"localTransaction.scheduleRetryTimes reached setted max times:{} but still failed so add to recovery failed collection,"
 							+ "serverName:{},localTransaction.id:{}",
 					getScheduleRetryTimes(), tccProperties.getApplication(), getTransactionId());
 		} else {
-			RepositoryFactory.getLocalTransactionRepository().save(this);
+			SpringBeanFactory.getBean(LocalTransactionRepository.class).save(this);
 		}
 	}
 
@@ -198,8 +199,7 @@ public class LocalTransactionImpl extends AbstractTransaction implements LocalTr
 
 	private void deleteAssociatedDownStreamApplications() {
 		if (getParentId() != null) {
-			RepositoryFactory.getTransactionDownstreamRepository()
-					.deleteAssociatedDownStreamApplications(getParentId());
+			SpringBeanFactory.getBean(TransactionDownstreamRepository.class).deleteAssociatedDownStreamApplications(getParentId());
 			this.parentId = null;
 		}
 	}

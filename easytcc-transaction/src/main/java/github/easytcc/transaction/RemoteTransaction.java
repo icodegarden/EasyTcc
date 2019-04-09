@@ -5,8 +5,9 @@ import java.util.Collection;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import github.easytcc.remoting.factory.TransactionChannelFactory;
-import github.easytcc.repository.factory.RepositoryFactory;
+import github.easytcc.factory.SpringBeanFactory;
+import github.easytcc.remoting.TransactionChannel;
+import github.easytcc.repository.TransactionDownstreamRepository;
 
 /**
  * @author Fangfang.Xu
@@ -29,14 +30,14 @@ public class RemoteTransaction extends AbstractTransaction {
 	public boolean commit() {
 		boolean result = true;
 		try {
-			Collection<String> applications = RepositoryFactory.getTransactionDownstreamRepository()
+			Collection<String> applications = SpringBeanFactory.getBean(TransactionDownstreamRepository.class)
 					.getAssociatedDownStreamApplications(localTransactionId);
 			if (logger.isDebugEnabled()) {
 				logger.debug("RemoteTransaction commit,applications : {}", applications);
 			}
 			if (applications != null) {
 				for (String application : applications) {
-					boolean success = TransactionChannelFactory.getTransactionChannel().sendTransaction(application,
+					boolean success = SpringBeanFactory.getBean(TransactionChannel.class).sendTransaction(application,
 							getXid(), TransactionStatus.COMMIT);
 					if (!success) {
 						result = false;
@@ -54,14 +55,14 @@ public class RemoteTransaction extends AbstractTransaction {
 	public boolean rollback() {
 		boolean result = true;
 		try {
-			Collection<String> applications = RepositoryFactory.getTransactionDownstreamRepository()
+			Collection<String> applications = SpringBeanFactory.getBean(TransactionDownstreamRepository.class)
 					.getAssociatedDownStreamApplications(localTransactionId);
 			if (logger.isDebugEnabled()) {
 				logger.debug("RemoteTransaction rollback,applications : {}", applications);
 			}
 			if (applications != null) {
 				for (String application : applications) {
-					boolean success = TransactionChannelFactory.getTransactionChannel().sendTransaction(application,
+					boolean success = SpringBeanFactory.getBean(TransactionChannel.class).sendTransaction(application,
 							getXid(), TransactionStatus.ROLLBACK);
 					if (!success) {
 						result = false;
