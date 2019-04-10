@@ -1,6 +1,8 @@
 package github.easytcc;
 
-import java.util.concurrent.LinkedBlockingDeque;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.RejectedExecutionException;
+import java.util.concurrent.RejectedExecutionHandler;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
@@ -37,15 +39,16 @@ public class TransactionAspect {
 
 	TccProperties tccProperties;
 
-	ThreadPoolExecutor handleThreadPool;
+	ThreadPoolExecutor realtimeHandleThreadPool;
 
-	public TransactionAspect(AspectExecutionChain chain, XidRepository xidRepository, TccProperties tccProperties) {
+	public TransactionAspect(AspectExecutionChain chain, XidRepository xidRepository,
+			final TccProperties tccProperties) {
 		this.chain = chain;
 		this.xidRepository = xidRepository;
 		this.tccProperties = tccProperties;
-		handleThreadPool = new ThreadPoolExecutor(tccProperties.getTransactionHandleCorePoolSize(),
+		realtimeHandleThreadPool = new ThreadPoolExecutor(tccProperties.getTransactionHandleCorePoolSize(),
 				tccProperties.getTransactionHandleMaxPoolSize(), tccProperties.getTransactionHandlekeepAliveSeconds(),
-				TimeUnit.SECONDS, new LinkedBlockingDeque<Runnable>(tccProperties.getTransactionHandleQueueSize()),
+				TimeUnit.SECONDS, new LinkedBlockingQueue<Runnable>(tccProperties.getTransactionHandleQueueSize()),
 				new ThreadFactory() {
 					ThreadGroup mGroup;
 					protected final AtomicInteger mThreadNum = new AtomicInteger(1);
@@ -60,6 +63,14 @@ public class TransactionAspect {
 						Thread ret = new Thread(mGroup, r, name, 0);
 						ret.setDaemon(false);
 						return ret;
+					}
+				}, new RejectedExecutionHandler() {
+					@Override
+					public void rejectedExecution(Runnable r, ThreadPoolExecutor e) {
+						throw new RejectedExecutionException("realtimeHandleThreadPool Task " + r.toString()
+								+ " rejected from " + e.toString() + ",transactionHandleMaxPoolSize "
+								+ tccProperties.getTransactionHandleMaxPoolSize() + ",transactionHandleQueueSize "
+								+ tccProperties.getTransactionHandleQueueSize());
 					}
 				});
 	}
@@ -102,11 +113,11 @@ public class TransactionAspect {
 		try {
 			Object result = pjp.proceed();
 
-			handleThreadPool.execute(new AfterProceedSuccessRunnable(transactionContext, pointWrapper));
+			realtimeHandleThreadPool.execute(new AfterProceedSuccessRunnable(transactionContext, pointWrapper));
 
 			return result;
 		} catch (final Throwable e) {
-			handleThreadPool.execute(new AfterProceedFailedRunnable(transactionContext, pointWrapper, e));
+			realtimeHandleThreadPool.execute(new AfterProceedFailedRunnable(transactionContext, pointWrapper, e));
 			throw e;
 		}
 	}
@@ -114,10 +125,12 @@ public class TransactionAspect {
 	class AfterProceedSuccessRunnable implements Runnable {
 		TransactionContext transactionContext;
 		ProceedingJoinPointWrapper pointWrapper;
+
 		AfterProceedSuccessRunnable(TransactionContext transactionContext, ProceedingJoinPointWrapper pointWrapper) {
 			this.transactionContext = transactionContext;
 			this.pointWrapper = pointWrapper;
 		}
+
 		@Override
 		public void run() {
 			TransactionContextHolder.setContext(transactionContext);
@@ -138,12 +151,14 @@ public class TransactionAspect {
 		TransactionContext transactionContext;
 		ProceedingJoinPointWrapper pointWrapper;
 		Throwable e;
+
 		AfterProceedFailedRunnable(TransactionContext transactionContext, ProceedingJoinPointWrapper pointWrapper,
 				Throwable e) {
 			this.transactionContext = transactionContext;
 			this.pointWrapper = pointWrapper;
 			this.e = e;
 		}
+
 		@Override
 		public void run() {
 			TransactionContextHolder.setContext(transactionContext);
