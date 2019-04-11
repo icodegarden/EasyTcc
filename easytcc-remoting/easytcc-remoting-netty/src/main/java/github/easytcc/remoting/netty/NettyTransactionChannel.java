@@ -51,10 +51,11 @@ public class NettyTransactionChannel implements TransactionChannel, ApplicationL
 
 	@PostConstruct
 	public void init() throws RemotingException {
-		server = Exchangers.bind(
-				URL.valueOf(
-						"exchange://" + bind + ":" + nettyProperties.getNettyServerPort() + "?server=netty4&heartbeat="
-								+ nettyProperties.getHeartbeat() + "&threadpool=" + nettyProperties.getThreadpool()),
+		server = Exchangers.bind(URL.valueOf("exchange://" + bind + ":" + nettyProperties.getNettyServerPort()
+				+ "?server=netty4&heartbeat=" + nettyProperties.getHeartbeat() + "&threadpool="
+				+ nettyProperties.getThreadpool() + "&threadname=" + nettyProperties.getThreadname() + "&corethreads="
+				+ nettyProperties.getCorethreads() + "&threads=" + nettyProperties.getThreads() + "&queues="
+				+ nettyProperties.getQueues() + "&alive=" + nettyProperties.getAliveMillis()),
 				new ServerChannelHandler(nettyRepository, bind, nettyProperties.getNettyServerPort()),
 				new ServerTransactionReplier(new ServerTransactionExecutor(localTransactionRepository)));
 
