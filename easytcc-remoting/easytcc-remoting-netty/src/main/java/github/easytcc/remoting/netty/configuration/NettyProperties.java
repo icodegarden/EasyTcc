@@ -29,6 +29,21 @@ public class NettyProperties {
 	@Value("${" + PREFIX + ".server.threadpool:cached}")
 	private String threadpool;
 	
+	@Value("${" + PREFIX + ".server.threadname:EasyTccNettyServer}")
+	private String threadname;
+	
+	@Value("${" + PREFIX + ".server.corethreads:30}")
+	private int corethreads;
+	
+	@Value("${" + PREFIX + ".server.threads:60}")
+	private int threads;
+	
+	@Value("${" + PREFIX + ".server.queues:"+Integer.MAX_VALUE+"}")
+	private int queues;
+	
+	@Value("${" + PREFIX + ".server.aliveMillis:60000}")
+	private int aliveMillis;
+	
 	@Value("${" + PREFIX + ".client.requestTimeout:3000}")
 	private int requestTimeout;
 	
@@ -81,6 +96,26 @@ public class NettyProperties {
 
 	public int getNettyServerWeight() {
 		return nettyServerWeight;
+	}
+
+	public String getThreadname() {
+		return threadname;
+	}
+
+	public int getCorethreads() {
+		return corethreads;
+	}
+
+	public int getThreads() {
+		return threads;
+	}
+
+	public int getQueues() {
+		return queues;
+	}
+
+	public int getAliveMillis() {
+		return aliveMillis;
 	}
 	
 }
