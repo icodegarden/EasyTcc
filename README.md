@@ -38,5 +38,5 @@ After reaching the number of times, the global transaction and local transaction
 
 # [Developer-Documentation 开发者文档](https://github.com/HiFangfangXu/EasyTcc/wiki/Developer-Documentation)
 Spring cloud, Dubbo integration and related customization  
-springcloud、dubbo等集成和相关自定义  
+springcloud、dubbo等集成和相关自定义   
 
